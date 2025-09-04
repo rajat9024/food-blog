@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="recipe-title-page">Recipe - My Food Blog</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="data/recipes.js"></script>
+</head>
+<body>
+
+    <header class="header">
+        <nav class="navbar">
+            <a href="index.html" class="logo">My Food Blog</a>
+            <div class="nav-links" id="nav-links">
+                <a href="index.html">Home</a>
+                <a href="#recipes">Recipes</a>
+                <a href="#about">About</a>
+               
+            </div>
+            <button class="hamburger" id="hamburger">&#9776;</button>
+        </nav>
+    </header>
+
+    <main class="container recipe-page">
+        <article>
+            <h1 class="recipe-title" id="recipe-title-h1"></h1>
+            <img id="recipe-image" alt="Recipe Image" class="recipe-image">
+            
+            <button class="translate-btn" id="translate-btn">Translate to Hindi</button>
+
+            <div id="original-content">
+                <section class="recipe-details">
+                    <p id="recipe-description"></p>
+                    
+                    <h2>Ingredients</h2>
+                    <ul id="recipe-ingredients"></ul>
+
+                    <h2>Instructions</h2>
+                    <ol id="recipe-instructions"></ol>
+                </section>
+            </div>
+
+            <div id="translated-content" style="display: none;">
+                <p>Translating...</p>
+            </div>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 My Food Blog. All Rights Reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hamburger menu functionality
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('nav-links');
+            hamburger.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+
+            // Get recipe ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const recipeId = urlParams.get('id');
+            const recipe = allRecipes.find(r => r.id === recipeId);
+
+            if (recipe) {
+                // Populate the page with the found recipe data
+                document.getElementById('recipe-title-page').textContent = `${recipe.title} - My Food Blog`;
+                document.getElementById('recipe-title-h1').textContent = recipe.title;
+                document.getElementById('recipe-image').src = recipe.image;
+                document.getElementById('recipe-image').alt = recipe.title;
+                document.getElementById('recipe-description').textContent = recipe.description;
+
+                const ingredientsList = document.getElementById('recipe-ingredients');
+                recipe.ingredients.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    ingredientsList.appendChild(li);
+                });
+
+                const instructionsList = document.getElementById('recipe-instructions');
+                recipe.instructions.forEach(step => {
+                    const li = document.createElement('li');
+                    li.textContent = step;
+                    instructionsList.appendChild(li);
+                });
+            } else {
+                // Handle case where recipe is not found
+                document.getElementById('recipe-title-h1').textContent = 'Recipe Not Found';
+                document.getElementById('original-content').innerHTML = '<p>The recipe you are looking for does not exist.</p>';
+                document.getElementById('translate-btn').style.display = 'none';
+            }
+
+            // Translation functionality
+            const translateBtn = document.getElementById('translate-btn');
+            const originalContent = document.getElementById('original-content');
+            const translatedContent = document.getElementById('translated-content');
+            let isHindi = false;
+
+            translateBtn.addEventListener('click', async () => {
+                isHindi = !isHindi;
+
+                if (isHindi) {
+                    originalContent.style.display = 'none';
+                    translatedContent.style.display = 'block';
+                    translatedContent.innerHTML = '<p>Translating...</p>';
+                    translateBtn.textContent = 'Translate to English';
+
+                    try {
+                        const elementsToTranslate = originalContent.querySelectorAll('p, h2, li');
+                        const translationPromises = [];
+
+                        elementsToTranslate.forEach(element => {
+                            const text = element.innerText;
+                            const promise = fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|hi`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    const translatedText = data.responseData.translatedText || text;
+                                    return `<${element.tagName.toLowerCase()}>${translatedText}</${element.tagName.toLowerCase()}>`;
+                                })
+                                .catch(error => {
+                                    console.error('Translation error:', error);
+                                    return `<${element.tagName.toLowerCase()}>Translation failed.</${element.tagName.toLowerCase()}>`;
+                                });
+                            translationPromises.push(promise);
+                        });
+
+                        const translatedResults = await Promise.all(translationPromises);
+                        
+                        translatedHtml = `<section class="recipe-details">` + translatedResults.join('') + `</section>`;
+                        translatedContent.innerHTML = translatedHtml;
+
+                    } catch (error) {
+                        console.error('Translation failed:', error);
+                        translatedContent.innerHTML = '<p>Translation failed. Please check your internet connection and try again.</p>';
+                        isHindi = false;
+                        translateBtn.textContent = 'Translate to Hindi';
+                    }
+                } else {
+                    originalContent.style.display = 'block';
+                    translatedContent.style.display = 'none';
+                    translateBtn.textContent = 'Translate to Hindi';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

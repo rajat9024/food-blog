@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic Margherita Pizza - My Food Blog</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <header class="header">
+        <nav class="navbar">
+            <a href="../index.html" class="logo">My Food Blog</a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="#recipes">Recipes</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container recipe-page">
+        <article>
+            <h1 class="recipe-title">Classic Margherita Pizza</h1>
+            <img src="https://cdn.loveandlemons.com/wp-content/uploads/2023/07/margherita-pizza.jpg" alt="Classic Margherita Pizza" class="recipe-image">
+            
+            <button class="translate-btn" id="translate-btn">Translate to Hindi</button>
+
+            <div id="original-content">
+                <section class="recipe-details">
+                    <p>Homemade pizza with fresh basil, mozzarella, and a tangy tomato sauce. Simple yet incredibly delicious, this classic Italian recipe is perfect for a fun night in.</p>
+                    
+                    <h2>Ingredients</h2>
+                    <ul>
+                        <li>1 ball of pizza dough</li>
+                        <li>1/2 cup tomato sauce</li>
+                        <li>8 oz fresh mozzarella, sliced</li>
+                        <li>A handful of fresh basil leaves</li>
+                        <li>1 tbsp olive oil</li>
+                        <li>Salt and black pepper to taste</li>
+                    </ul>
+
+                    <h2>Instructions</h2>
+                    <ol>
+                        <li>Preheat your oven to the highest temperature (usually 500°F or 260°C).</li>
+                        <li>On a floured surface, stretch or roll out the pizza dough into a circle.</li>
+                        <li>Spread the tomato sauce evenly over the dough, leaving a small border for the crust.</li>
+                        <li>Arrange the mozzarella slices and basil leaves on top. Drizzle with olive oil and sprinkle with salt and pepper.</li>
+                        <li>Bake for 10-15 minutes, or until the crust is golden brown and the cheese is melted and bubbly.</li>
+                        <li>Let it cool for a few minutes before slicing and serving.</li>
+                    </ol>
+                </section>
+            </div>
+
+            <div id="translated-content" style="display: none;">
+                <p>Translating...</p>
+            </div>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 My Food Blog. All Rights Reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const translateBtn = document.getElementById('translate-btn');
+            const originalContent = document.getElementById('original-content');
+            const translatedContent = document.getElementById('translated-content');
+            let isHindi = false;
+
+            translateBtn.addEventListener('click', async () => {
+                isHindi = !isHindi;
+
+                if (isHindi) {
+                    originalContent.style.display = 'none';
+                    translatedContent.style.display = 'block';
+                    translatedContent.innerHTML = '<p>Translating...</p>';
+                    translateBtn.textContent = 'Translate to English';
+
+                    try {
+                        const elementsToTranslate = originalContent.querySelectorAll('p, h2, li');
+                        const translationPromises = [];
+
+                        elementsToTranslate.forEach(element => {
+                            const text = element.innerText;
+                            const promise = fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|hi`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    const translatedText = data.responseData.translatedText || text;
+                                    return `<${element.tagName.toLowerCase()}>${translatedText}</${element.tagName.toLowerCase()}>`;
+                                })
+                                .catch(error => {
+                                    console.error('Translation error:', error);
+                                    return `<${element.tagName.toLowerCase()}>Translation failed.</${element.tagName.toLowerCase()}>`;
+                                });
+                            translationPromises.push(promise);
+                        });
+
+                        const translatedResults = await Promise.all(translationPromises);
+                        
+                        translatedHtml = `<section class="recipe-details">` + translatedResults.join('') + `</section>`;
+                        translatedContent.innerHTML = translatedHtml;
+
+                    } catch (error) {
+                        console.error('Translation failed:', error);
+                        translatedContent.innerHTML = '<p>Translation failed. Please check your internet connection and try again.</p>';
+                        isHindi = false;
+                        translateBtn.textContent = 'Translate to Hindi';
+                    }
+                } else {
+                    originalContent.style.display = 'block';
+                    translatedContent.style.display = 'none';
+                    translateBtn.textContent = 'Translate to Hindi';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

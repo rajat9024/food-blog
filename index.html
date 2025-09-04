@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍜 My Food Blog</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="data/recipes.js"></script>
+</head>
+
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <a href="index.html" class="logo">🍜 My Food Blog</a>
+            <div class="nav-links" id="nav-links">
+                <a href="index.html">Home</a>
+                <a href="#recipes">Recipes</a>
+                <a href="#about">About</a>
+
+            </div>
+            <button class="hamburger" id="hamburger">&#9776;</button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Delicious Recipes for Everyone</h1>
+            <p>Explore a variety of dishes from around the world, from quick weeknight meals to impressive desserts.</p>
+        </section>
+
+        <section id="recipes" class="recipe-list">
+            <h2>Our Latest Recipes</h2>
+            <div id="recipe-container" class="recipe-card-container">
+            </div>
+        </section>
+      
+        <section id="about" class="about">
+            <h1>About Me</h1>
+            <section class="about-us">
+                <h2>Our Story</h2>
+                <p>Hello and welcome! I’m Rajat Singh , the face and apron behind food blog. This blog was born
+                    out of a simple love for good food and the joy of sharing it with others. What started as a personal
+                    collection of my favorite recipes has grown into a community for home cooks who want to create magic
+                    in their own kitchens.</p>
+
+                <p>I believe that cooking should be an adventure, not a chore. My recipes are designed to be
+                    approachable and delicious, using fresh ingredients and simple techniques. From quick 30-minute
+                    meals to decadent weekend bakes, I'm here to inspire you to get creative and find joy in the process
+                    of cooking.</p>
+
+                <p>Thank you for stopping by! I hope you find a recipe here that becomes a new favorite in your home.
+                </p>
+
+            </section>
+          
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 My Food Blog. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('nav-links');
+            const recipeContainer = document.getElementById('recipe-container');
+
+            hamburger.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+
+            // Dynamically create recipe cards from the data file
+            allRecipes.forEach(recipe => {
+                const card = document.createElement('div');
+                card.classList.add('recipe-card');
+                card.innerHTML = `
+                    <img src="${recipe.image}" alt="${recipe.title}">
+                    <div class="recipe-info">
+                        <h3>${recipe.title}</h3>
+                        <p>${recipe.description}</p>
+                        <a href="recipe-template.html?id=${recipe.id}" class="read-more">Read More</a>
+                    </div>
+                `;
+                recipeContainer.appendChild(card);
+            });
+        });
+    </script>
+</body>
+
+</html>

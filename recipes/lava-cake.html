@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chocolate Lava Cake - My Food Blog</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <header class="header">
+        <nav class="navbar">
+            <a href="../index.html" class="logo">My Food Blog</a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="#recipes">Recipes</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container recipe-page">
+        <article>
+            <h1 class="recipe-title">Chocolate Lava Cake</h1>
+            <img src="https://insanelygoodrecipes.com/wp-content/uploads/2025/01/copycat-chilis-molten-lava-cake-featured.jpg" alt="Chocolate Lava Cake" class="recipe-image">
+            
+            <button class="translate-btn" id="translate-btn">Translate to Hindi</button>
+
+            <div id="original-content">
+                <section class="recipe-details">
+                    <p>Rich, decadent chocolate cakes with a molten center that oozes out upon the first cut. This is a simple dessert that looks impressive and tastes amazing.</p>
+                    
+                    <h2>Ingredients</h2>
+                    <ul>
+                        <li>4 oz unsalted butter</li>
+                        <li>4 oz bittersweet chocolate, chopped</li>
+                        <li>2 large eggs</li>
+                        <li>2 large egg yolks</li>
+                        <li>1/4 cup sugar</li>
+                        <li>1/4 tsp salt</li>
+                        <li>2 tbsp all-purpose flour</li>
+                    </ul>
+
+                    <h2>Instructions</h2>
+                    <ol>
+                        <li>Preheat oven to 425°F (220°C). Grease and flour four small ramekins.</li>
+                        <li>Melt the butter and chocolate together in a heatproof bowl set over a pot of simmering water. Stir until smooth. Remove from heat and let cool slightly.</li>
+                        <li>In a separate bowl, whisk the eggs, egg yolks, sugar, and salt until thick and pale.</li>
+                        <li>Gently fold the chocolate mixture into the egg mixture. Sift the flour over the batter and fold until just combined.</li>
+                        <li>Divide the batter among the prepared ramekins.</li>
+                        <li>Bake for 12-14 minutes, or until the edges are set but the center is still soft.</li>
+                        <li>Carefully invert each cake onto a plate and serve immediately.</li>
+                    </ol>
+                </section>
+            </div>
+
+            <div id="translated-content" style="display: none;">
+                <p>Translating...</p>
+            </div>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 My Food Blog. All Rights Reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const translateBtn = document.getElementById('translate-btn');
+            const originalContent = document.getElementById('original-content');
+            const translatedContent = document.getElementById('translated-content');
+            let isHindi = false;
+
+            translateBtn.addEventListener('click', async () => {
+                isHindi = !isHindi;
+
+                if (isHindi) {
+                    originalContent.style.display = 'none';
+                    translatedContent.style.display = 'block';
+                    translatedContent.innerHTML = '<p>Translating...</p>';
+                    translateBtn.textContent = 'Translate to English';
+
+                    try {
+                        const elementsToTranslate = originalContent.querySelectorAll('p, h2, li');
+                        const translationPromises = [];
+
+                        elementsToTranslate.forEach(element => {
+                            const text = element.innerText;
+                            const promise = fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|hi`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    const translatedText = data.responseData.translatedText || text;
+                                    return `<${element.tagName.toLowerCase()}>${translatedText}</${element.tagName.toLowerCase()}>`;
+                                })
+                                .catch(error => {
+                                    console.error('Translation error:', error);
+                                    return `<${element.tagName.toLowerCase()}>Translation failed.</${element.tagName.toLowerCase()}>`;
+                                });
+                            translationPromises.push(promise);
+                        });
+
+                        const translatedResults = await Promise.all(translationPromises);
+                        
+                        translatedHtml = `<section class="recipe-details">` + translatedResults.join('') + `</section>`;
+                        translatedContent.innerHTML = translatedHtml;
+
+                    } catch (error) {
+                        console.error('Translation failed:', error);
+                        translatedContent.innerHTML = '<p>Translation failed. Please check your internet connection and try again.</p>';
+                        isHindi = false;
+                        translateBtn.textContent = 'Translate to Hindi';
+                    }
+                } else {
+                    originalContent.style.display = 'block';
+                    translatedContent.style.display = 'none';
+                    translateBtn.textContent = 'Translate to Hindi';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

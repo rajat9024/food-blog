@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spicy Tofu Stir-Fry - My Food Blog</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <header class="header">
+        <nav class="navbar">
+            <a href="../index.html" class="logo">My Food Blog</a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="#recipes">Recipes</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container recipe-page">
+        <article>
+            <h1 class="recipe-title">Spicy Tofu Stir-Fry</h1>
+            <img src="https://zenaskitchen.com/wp-content/uploads/2022/01/zk-photos-05.jpg" alt="Spicy Tofu Stir-Fry" class="recipe-image">
+            
+            <button class="translate-btn" id="translate-btn">Translate to Hindi</button>
+
+            <div id="original-content">
+                <section class="recipe-details">
+                    <p>A quick and flavorful stir-fry with crispy tofu and fresh vegetables, perfect for a weeknight meal. This dish is great for a healthy and satisfying dinner.</p>
+                    
+                    <h2>Ingredients</h2>
+                    <ul>
+                        <li>1 lb firm tofu, pressed and cubed</li>
+                        <li>2 tbsp soy sauce</li>
+                        <li>1 tbsp cornstarch</li>
+                        <li>1 tbsp sesame oil</li>
+                        <li>1 red bell pepper, sliced</li>
+                        <li>1 cup broccoli florets</li>
+                        <li>3 cloves garlic, minced</li>
+                        <li>1 tbsp grated ginger</li>
+                        <li>1/4 cup stir-fry sauce</li>
+                        <li>1/2 tsp red pepper flakes (adjust to taste)</li>
+                    </ul>
+
+                    <h2>Instructions</h2>
+                    <ol>
+                        <li>In a bowl, toss the tofu cubes with soy sauce and cornstarch until coated.</li>
+                        <li>Heat sesame oil in a large skillet or wok over medium-high heat. Add the tofu and cook until golden brown and crispy on all sides. Remove from the pan.</li>
+                        <li>Add the bell pepper and broccoli to the same pan. Stir-fry for 3-4 minutes until crisp-tender.</li>
+                        <li>Add the garlic and ginger, cooking for one minute until fragrant.</li>
+                        <li>Pour in the stir-fry sauce and red pepper flakes. Bring to a simmer.</li>
+                        <li>Return the tofu to the pan and toss to coat with the sauce. Cook for 1-2 minutes until heated through.</li>
+                        <li>Serve hot with rice or noodles.</li>
+                    </ol>
+                </section>
+            </div>
+
+            <div id="translated-content" style="display: none;">
+                <p>Translating...</p>
+            </div>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 My Food Blog. All Rights Reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const translateBtn = document.getElementById('translate-btn');
+            const originalContent = document.getElementById('original-content');
+            const translatedContent = document.getElementById('translated-content');
+            let isHindi = false;
+
+            translateBtn.addEventListener('click', async () => {
+                isHindi = !isHindi;
+
+                if (isHindi) {
+                    originalContent.style.display = 'none';
+                    translatedContent.style.display = 'block';
+                    translatedContent.innerHTML = '<p>Translating...</p>';
+                    translateBtn.textContent = 'Translate to English';
+
+                    try {
+                        const elementsToTranslate = originalContent.querySelectorAll('p, h2, li');
+                        const translationPromises = [];
+
+                        elementsToTranslate.forEach(element => {
+                            const text = element.innerText;
+                            const promise = fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|hi`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    const translatedText = data.responseData.translatedText || text;
+                                    return `<${element.tagName.toLowerCase()}>${translatedText}</${element.tagName.toLowerCase()}>`;
+                                })
+                                .catch(error => {
+                                    console.error('Translation error:', error);
+                                    return `<${element.tagName.toLowerCase()}>Translation failed.</${element.tagName.toLowerCase()}>`;
+                                });
+                            translationPromises.push(promise);
+                        });
+
+                        const translatedResults = await Promise.all(translationPromises);
+                        
+                        translatedHtml = `<section class="recipe-details">` + translatedResults.join('') + `</section>`;
+                        translatedContent.innerHTML = translatedHtml;
+
+                    } catch (error) {
+                        console.error('Translation failed:', error);
+                        translatedContent.innerHTML = '<p>Translation failed. Please check your internet connection and try again.</p>';
+                        isHindi = false;
+                        translateBtn.textContent = 'Translate to Hindi';
+                    }
+                } else {
+                    originalContent.style.display = 'block';
+                    translatedContent.style.display = 'none';
+                    translateBtn.textContent = 'Translate to Hindi';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
