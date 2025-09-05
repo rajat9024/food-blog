@@ -52,6 +52,20 @@ body {
     font-weight: bold;
     text-decoration: none;
     color: var(--primary-color);
+    
+  /* The name of the @keyframes rule */
+  animation-name: color-change; 
+  
+  /* How long the animation takes to complete */
+  animation-duration: 5s; 
+  
+  /* How many times the animation repeats */
+  animation-iteration-count: infinite; 
+  
+  /* How the animation progresses */
+  animation-timing-function: ease-in-out; 
+  
+
 }
 
 .nav-links {
@@ -280,6 +294,24 @@ body {
     color: var(--primary-color);
     font-size: 50px;
     
+}
+
+@keyframes color-change {
+  0% {
+    color: red;
+  }
+  25% {
+    color: rgb(204, 255, 0);
+  }
+  50% {
+    color: blue;
+  }
+  75% {
+    color: rgb(255, 0, 212);
+  }
+  100% {
+    color: green;
+  }
 }
 /* Responsive Design */
 @media (max-width: 768px) {
